@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllTasks, createTask } from "@/lib/services/tasks";
-import type { TaskStatus, TaskType } from "@/lib/types";
+import type { TaskStatus, TaskType, Section } from "@/lib/types";
 
-// GET /api/tasks?status=NEW&type=EVENT_REQUEST&ownerId=xxx
+// GET /api/tasks?status=NEW&type=STORY_PITCH&section=NEWS&ownerId=xxx
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl;
     const filters = {
       status: (searchParams.get("status") as TaskStatus) || undefined,
       type: (searchParams.get("type") as TaskType) || undefined,
+      section: (searchParams.get("section") as Section) || undefined,
       ownerId: searchParams.get("ownerId") || undefined,
     };
 

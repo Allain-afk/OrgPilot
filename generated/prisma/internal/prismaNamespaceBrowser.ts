@@ -91,6 +91,7 @@ export const TaskScalarFieldEnum = {
   type: 'type',
   status: 'status',
   priority: 'priority',
+  section: 'section',
   ownerId: 'ownerId',
   dueDate: 'dueDate',
   sourceSystem: 'sourceSystem',
@@ -105,6 +106,7 @@ export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof Task
 export const AgentActionLogScalarFieldEnum = {
   id: 'id',
   taskId: 'taskId',
+  agentId: 'agentId',
   eventType: 'eventType',
   rawEvent: 'rawEvent',
   actionDescription: 'actionDescription',

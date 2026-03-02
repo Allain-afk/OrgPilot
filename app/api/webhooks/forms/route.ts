@@ -3,11 +3,15 @@ import { runAgent } from "@/lib/ai/agent";
 import { findTasksBySourceId } from "@/lib/services/tasks";
 
 const KNOWN_FORM_TYPES = [
-  "EVENT_REQUEST",
-  "FACILITY_ISSUE",
-  "FINANCE_REQUEST",
-  "MEMBERSHIP",
-  "FEEDBACK_OR_COMPLAINT",
+  "STORY_PITCH",
+  "ARTICLE_ASSIGNMENT",
+  "ARTICLE_REVIEW",
+  "LAYOUT_REQUEST",
+  "PHOTO_ASSIGNMENT",
+  "EVENT_COVERAGE",
+  "PUBLICATION_ISSUE",
+  "SOCIAL_MEDIA_POST",
+  "TEAM_TASK",
 ];
 
 export async function POST(req: Request) {
@@ -28,7 +32,6 @@ export async function POST(req: Request) {
     const normalizedFormType =
       formType && KNOWN_FORM_TYPES.includes(formType) ? formType : "OTHER";
 
-    // Build normalized event
     const event = {
       formType: normalizedFormType,
       payload,
@@ -36,7 +39,6 @@ export async function POST(req: Request) {
       receivedAt: new Date().toISOString(),
     };
 
-    // Look up existing tasks by sourceId if provided
     const sourceId =
       (payload.sourceId as string) ??
       (payload.responseId as string) ??
@@ -45,12 +47,12 @@ export async function POST(req: Request) {
       ? await findTasksBySourceId(sourceId)
       : [];
 
-    // Run the agent
     const result = await runAgent(event, { existingTasks });
 
     return NextResponse.json({
       success: true,
       summary: result.summary,
+      agentId: result.agentId,
       toolCallCount: result.toolCallCount,
     });
   } catch (error) {

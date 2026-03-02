@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/db/prisma";
-import type { TaskType, TaskStatus, TaskPriority, SourceSystem } from "@/lib/types";
+import type { TaskType, TaskStatus, TaskPriority, SourceSystem, Section } from "@/lib/types";
 
 // ─── Filters ────────────────────────────────────────────────────
 export interface TaskFilters {
   status?: TaskStatus;
   type?: TaskType;
+  section?: Section;
   ownerId?: string;
 }
 
@@ -14,6 +15,7 @@ export interface CreateTaskInput {
   description: string;
   type?: TaskType;
   priority?: TaskPriority;
+  section?: Section;
   ownerId?: string;
   dueDate?: string | Date;
   sourceSystem?: SourceSystem;
@@ -28,6 +30,7 @@ export async function createTask(data: CreateTaskInput) {
       type: data.type ?? "OTHER",
       priority: data.priority ?? "MEDIUM",
       status: "NEW",
+      section: data.section ?? null,
       ownerId: data.ownerId ?? null,
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
       sourceSystem: data.sourceSystem ?? "MANUAL",
@@ -42,6 +45,7 @@ export async function getAllTasks(filters?: TaskFilters) {
   const where: Record<string, unknown> = {};
   if (filters?.status) where.status = filters.status;
   if (filters?.type) where.type = filters.type;
+  if (filters?.section) where.section = filters.section;
   if (filters?.ownerId) where.ownerId = filters.ownerId;
 
   return prisma.task.findMany({
@@ -71,6 +75,8 @@ export async function updateTask(
   if (data.type !== undefined) updateData.type = data.type;
   if (data.priority !== undefined) updateData.priority = data.priority;
   if (data.status !== undefined) updateData.status = data.status;
+  if ((data as Record<string, unknown>).section !== undefined)
+    updateData.section = (data as Record<string, unknown>).section;
   if (data.ownerId !== undefined) updateData.ownerId = data.ownerId;
   if (data.dueDate !== undefined)
     updateData.dueDate = data.dueDate ? new Date(data.dueDate) : null;
@@ -120,6 +126,7 @@ export async function assignTaskOwner(taskId: string, ownerId: string) {
 export interface TaskReviewFilters {
   status?: string;
   type?: string;
+  section?: string;
   priority?: string;
   overdue?: boolean;
 }
@@ -128,6 +135,7 @@ export async function getTasksForReview(filters?: TaskReviewFilters) {
   const where: Record<string, unknown> = {};
   if (filters?.status) where.status = filters.status;
   if (filters?.type) where.type = filters.type;
+  if (filters?.section) where.section = filters.section;
   if (filters?.priority) where.priority = filters.priority;
 
   const tasks = await prisma.task.findMany({

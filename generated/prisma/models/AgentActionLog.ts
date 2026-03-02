@@ -27,6 +27,7 @@ export type AggregateAgentActionLog = {
 export type AgentActionLogMinAggregateOutputType = {
   id: string | null
   taskId: string | null
+  agentId: string | null
   eventType: string | null
   rawEvent: string | null
   actionDescription: string | null
@@ -38,6 +39,7 @@ export type AgentActionLogMinAggregateOutputType = {
 export type AgentActionLogMaxAggregateOutputType = {
   id: string | null
   taskId: string | null
+  agentId: string | null
   eventType: string | null
   rawEvent: string | null
   actionDescription: string | null
@@ -49,6 +51,7 @@ export type AgentActionLogMaxAggregateOutputType = {
 export type AgentActionLogCountAggregateOutputType = {
   id: number
   taskId: number
+  agentId: number
   eventType: number
   rawEvent: number
   actionDescription: number
@@ -62,6 +65,7 @@ export type AgentActionLogCountAggregateOutputType = {
 export type AgentActionLogMinAggregateInputType = {
   id?: true
   taskId?: true
+  agentId?: true
   eventType?: true
   rawEvent?: true
   actionDescription?: true
@@ -73,6 +77,7 @@ export type AgentActionLogMinAggregateInputType = {
 export type AgentActionLogMaxAggregateInputType = {
   id?: true
   taskId?: true
+  agentId?: true
   eventType?: true
   rawEvent?: true
   actionDescription?: true
@@ -84,6 +89,7 @@ export type AgentActionLogMaxAggregateInputType = {
 export type AgentActionLogCountAggregateInputType = {
   id?: true
   taskId?: true
+  agentId?: true
   eventType?: true
   rawEvent?: true
   actionDescription?: true
@@ -168,6 +174,7 @@ export type AgentActionLogGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
 export type AgentActionLogGroupByOutputType = {
   id: string
   taskId: string | null
+  agentId: string
   eventType: string
   rawEvent: string
   actionDescription: string
@@ -200,6 +207,7 @@ export type AgentActionLogWhereInput = {
   NOT?: Prisma.AgentActionLogWhereInput | Prisma.AgentActionLogWhereInput[]
   id?: Prisma.StringFilter<"AgentActionLog"> | string
   taskId?: Prisma.StringNullableFilter<"AgentActionLog"> | string | null
+  agentId?: Prisma.StringFilter<"AgentActionLog"> | string
   eventType?: Prisma.StringFilter<"AgentActionLog"> | string
   rawEvent?: Prisma.StringFilter<"AgentActionLog"> | string
   actionDescription?: Prisma.StringFilter<"AgentActionLog"> | string
@@ -212,6 +220,7 @@ export type AgentActionLogWhereInput = {
 export type AgentActionLogOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   taskId?: Prisma.SortOrderInput | Prisma.SortOrder
+  agentId?: Prisma.SortOrder
   eventType?: Prisma.SortOrder
   rawEvent?: Prisma.SortOrder
   actionDescription?: Prisma.SortOrder
@@ -227,6 +236,7 @@ export type AgentActionLogWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.AgentActionLogWhereInput[]
   NOT?: Prisma.AgentActionLogWhereInput | Prisma.AgentActionLogWhereInput[]
   taskId?: Prisma.StringNullableFilter<"AgentActionLog"> | string | null
+  agentId?: Prisma.StringFilter<"AgentActionLog"> | string
   eventType?: Prisma.StringFilter<"AgentActionLog"> | string
   rawEvent?: Prisma.StringFilter<"AgentActionLog"> | string
   actionDescription?: Prisma.StringFilter<"AgentActionLog"> | string
@@ -239,6 +249,7 @@ export type AgentActionLogWhereUniqueInput = Prisma.AtLeast<{
 export type AgentActionLogOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   taskId?: Prisma.SortOrderInput | Prisma.SortOrder
+  agentId?: Prisma.SortOrder
   eventType?: Prisma.SortOrder
   rawEvent?: Prisma.SortOrder
   actionDescription?: Prisma.SortOrder
@@ -256,6 +267,7 @@ export type AgentActionLogScalarWhereWithAggregatesInput = {
   NOT?: Prisma.AgentActionLogScalarWhereWithAggregatesInput | Prisma.AgentActionLogScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"AgentActionLog"> | string
   taskId?: Prisma.StringNullableWithAggregatesFilter<"AgentActionLog"> | string | null
+  agentId?: Prisma.StringWithAggregatesFilter<"AgentActionLog"> | string
   eventType?: Prisma.StringWithAggregatesFilter<"AgentActionLog"> | string
   rawEvent?: Prisma.StringWithAggregatesFilter<"AgentActionLog"> | string
   actionDescription?: Prisma.StringWithAggregatesFilter<"AgentActionLog"> | string
@@ -266,6 +278,7 @@ export type AgentActionLogScalarWhereWithAggregatesInput = {
 
 export type AgentActionLogCreateInput = {
   id?: string
+  agentId?: string
   eventType: string
   rawEvent?: string
   actionDescription: string
@@ -278,6 +291,7 @@ export type AgentActionLogCreateInput = {
 export type AgentActionLogUncheckedCreateInput = {
   id?: string
   taskId?: string | null
+  agentId?: string
   eventType: string
   rawEvent?: string
   actionDescription: string
@@ -288,6 +302,7 @@ export type AgentActionLogUncheckedCreateInput = {
 
 export type AgentActionLogUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  agentId?: Prisma.StringFieldUpdateOperationsInput | string
   eventType?: Prisma.StringFieldUpdateOperationsInput | string
   rawEvent?: Prisma.StringFieldUpdateOperationsInput | string
   actionDescription?: Prisma.StringFieldUpdateOperationsInput | string
@@ -300,6 +315,7 @@ export type AgentActionLogUpdateInput = {
 export type AgentActionLogUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   taskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  agentId?: Prisma.StringFieldUpdateOperationsInput | string
   eventType?: Prisma.StringFieldUpdateOperationsInput | string
   rawEvent?: Prisma.StringFieldUpdateOperationsInput | string
   actionDescription?: Prisma.StringFieldUpdateOperationsInput | string
@@ -311,6 +327,7 @@ export type AgentActionLogUncheckedUpdateInput = {
 export type AgentActionLogCreateManyInput = {
   id?: string
   taskId?: string | null
+  agentId?: string
   eventType: string
   rawEvent?: string
   actionDescription: string
@@ -321,6 +338,7 @@ export type AgentActionLogCreateManyInput = {
 
 export type AgentActionLogUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  agentId?: Prisma.StringFieldUpdateOperationsInput | string
   eventType?: Prisma.StringFieldUpdateOperationsInput | string
   rawEvent?: Prisma.StringFieldUpdateOperationsInput | string
   actionDescription?: Prisma.StringFieldUpdateOperationsInput | string
@@ -332,6 +350,7 @@ export type AgentActionLogUpdateManyMutationInput = {
 export type AgentActionLogUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   taskId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  agentId?: Prisma.StringFieldUpdateOperationsInput | string
   eventType?: Prisma.StringFieldUpdateOperationsInput | string
   rawEvent?: Prisma.StringFieldUpdateOperationsInput | string
   actionDescription?: Prisma.StringFieldUpdateOperationsInput | string
@@ -353,6 +372,7 @@ export type AgentActionLogOrderByRelationAggregateInput = {
 export type AgentActionLogCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   taskId?: Prisma.SortOrder
+  agentId?: Prisma.SortOrder
   eventType?: Prisma.SortOrder
   rawEvent?: Prisma.SortOrder
   actionDescription?: Prisma.SortOrder
@@ -364,6 +384,7 @@ export type AgentActionLogCountOrderByAggregateInput = {
 export type AgentActionLogMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   taskId?: Prisma.SortOrder
+  agentId?: Prisma.SortOrder
   eventType?: Prisma.SortOrder
   rawEvent?: Prisma.SortOrder
   actionDescription?: Prisma.SortOrder
@@ -375,6 +396,7 @@ export type AgentActionLogMaxOrderByAggregateInput = {
 export type AgentActionLogMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   taskId?: Prisma.SortOrder
+  agentId?: Prisma.SortOrder
   eventType?: Prisma.SortOrder
   rawEvent?: Prisma.SortOrder
   actionDescription?: Prisma.SortOrder
@@ -431,6 +453,7 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type AgentActionLogCreateWithoutTaskInput = {
   id?: string
+  agentId?: string
   eventType: string
   rawEvent?: string
   actionDescription: string
@@ -441,6 +464,7 @@ export type AgentActionLogCreateWithoutTaskInput = {
 
 export type AgentActionLogUncheckedCreateWithoutTaskInput = {
   id?: string
+  agentId?: string
   eventType: string
   rawEvent?: string
   actionDescription: string
@@ -481,6 +505,7 @@ export type AgentActionLogScalarWhereInput = {
   NOT?: Prisma.AgentActionLogScalarWhereInput | Prisma.AgentActionLogScalarWhereInput[]
   id?: Prisma.StringFilter<"AgentActionLog"> | string
   taskId?: Prisma.StringNullableFilter<"AgentActionLog"> | string | null
+  agentId?: Prisma.StringFilter<"AgentActionLog"> | string
   eventType?: Prisma.StringFilter<"AgentActionLog"> | string
   rawEvent?: Prisma.StringFilter<"AgentActionLog"> | string
   actionDescription?: Prisma.StringFilter<"AgentActionLog"> | string
@@ -491,6 +516,7 @@ export type AgentActionLogScalarWhereInput = {
 
 export type AgentActionLogCreateManyTaskInput = {
   id?: string
+  agentId?: string
   eventType: string
   rawEvent?: string
   actionDescription: string
@@ -501,6 +527,7 @@ export type AgentActionLogCreateManyTaskInput = {
 
 export type AgentActionLogUpdateWithoutTaskInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  agentId?: Prisma.StringFieldUpdateOperationsInput | string
   eventType?: Prisma.StringFieldUpdateOperationsInput | string
   rawEvent?: Prisma.StringFieldUpdateOperationsInput | string
   actionDescription?: Prisma.StringFieldUpdateOperationsInput | string
@@ -511,6 +538,7 @@ export type AgentActionLogUpdateWithoutTaskInput = {
 
 export type AgentActionLogUncheckedUpdateWithoutTaskInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  agentId?: Prisma.StringFieldUpdateOperationsInput | string
   eventType?: Prisma.StringFieldUpdateOperationsInput | string
   rawEvent?: Prisma.StringFieldUpdateOperationsInput | string
   actionDescription?: Prisma.StringFieldUpdateOperationsInput | string
@@ -521,6 +549,7 @@ export type AgentActionLogUncheckedUpdateWithoutTaskInput = {
 
 export type AgentActionLogUncheckedUpdateManyWithoutTaskInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  agentId?: Prisma.StringFieldUpdateOperationsInput | string
   eventType?: Prisma.StringFieldUpdateOperationsInput | string
   rawEvent?: Prisma.StringFieldUpdateOperationsInput | string
   actionDescription?: Prisma.StringFieldUpdateOperationsInput | string
@@ -534,6 +563,7 @@ export type AgentActionLogUncheckedUpdateManyWithoutTaskInput = {
 export type AgentActionLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   taskId?: boolean
+  agentId?: boolean
   eventType?: boolean
   rawEvent?: boolean
   actionDescription?: boolean
@@ -546,6 +576,7 @@ export type AgentActionLogSelect<ExtArgs extends runtime.Types.Extensions.Intern
 export type AgentActionLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   taskId?: boolean
+  agentId?: boolean
   eventType?: boolean
   rawEvent?: boolean
   actionDescription?: boolean
@@ -558,6 +589,7 @@ export type AgentActionLogSelectCreateManyAndReturn<ExtArgs extends runtime.Type
 export type AgentActionLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   taskId?: boolean
+  agentId?: boolean
   eventType?: boolean
   rawEvent?: boolean
   actionDescription?: boolean
@@ -570,6 +602,7 @@ export type AgentActionLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
 export type AgentActionLogSelectScalar = {
   id?: boolean
   taskId?: boolean
+  agentId?: boolean
   eventType?: boolean
   rawEvent?: boolean
   actionDescription?: boolean
@@ -578,7 +611,7 @@ export type AgentActionLogSelectScalar = {
   createdAt?: boolean
 }
 
-export type AgentActionLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "taskId" | "eventType" | "rawEvent" | "actionDescription" | "autoExecuted" | "proposedChanges" | "createdAt", ExtArgs["result"]["agentActionLog"]>
+export type AgentActionLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "taskId" | "agentId" | "eventType" | "rawEvent" | "actionDescription" | "autoExecuted" | "proposedChanges" | "createdAt", ExtArgs["result"]["agentActionLog"]>
 export type AgentActionLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   task?: boolean | Prisma.AgentActionLog$taskArgs<ExtArgs>
 }
@@ -597,6 +630,7 @@ export type $AgentActionLogPayload<ExtArgs extends runtime.Types.Extensions.Inte
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     taskId: string | null
+    agentId: string
     eventType: string
     rawEvent: string
     actionDescription: string
@@ -1029,6 +1063,7 @@ export interface Prisma__AgentActionLogClient<T, Null = never, ExtArgs extends r
 export interface AgentActionLogFieldRefs {
   readonly id: Prisma.FieldRef<"AgentActionLog", 'String'>
   readonly taskId: Prisma.FieldRef<"AgentActionLog", 'String'>
+  readonly agentId: Prisma.FieldRef<"AgentActionLog", 'String'>
   readonly eventType: Prisma.FieldRef<"AgentActionLog", 'String'>
   readonly rawEvent: Prisma.FieldRef<"AgentActionLog", 'String'>
   readonly actionDescription: Prisma.FieldRef<"AgentActionLog", 'String'>
