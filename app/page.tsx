@@ -1,65 +1,163 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState, useCallback } from "react";
+import { TaskTable } from "./components/TaskTable";
+import { LogFeed } from "./components/LogFeed";
+
+interface TaskOwner {
+  id: string;
+  name: string;
+  role: string;
+}
+
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  status: string;
+  priority: string;
+  owner: TaskOwner | null;
+  dueDate: string | null;
+  sourceSystem: string;
+  createdAt: string;
+}
+
+interface LogEntry {
+  id: string;
+  eventType: string;
+  actionDescription: string;
+  autoExecuted: boolean;
+  createdAt: string;
+  task?: { id: string; title: string } | null;
+}
+
+const TASK_TYPES = ["", "EVENT_REQUEST", "ISSUE", "FACILITY", "FINANCE", "OTHER"];
+const TASK_STATUSES = [
+  "",
+  "NEW",
+  "IN_PROGRESS",
+  "BLOCKED",
+  "DONE",
+  "CANCELLED",
+];
+
+export default function Dashboard() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterType, setFilterType] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const fetchTasks = useCallback(async () => {
+    const params = new URLSearchParams();
+    if (filterStatus) params.set("status", filterStatus);
+    if (filterType) params.set("type", filterType);
+    const res = await fetch(`/api/tasks?${params.toString()}`);
+    if (res.ok) setTasks(await res.json());
+  }, [filterStatus, filterType]);
+
+  const fetchLogs = useCallback(async () => {
+    const res = await fetch("/api/logs?limit=20");
+    if (res.ok) setLogs(await res.json());
+  }, []);
+
+  useEffect(() => {
+    Promise.all([fetchTasks(), fetchLogs()]).finally(() => setLoading(false));
+  }, [fetchTasks, fetchLogs]);
+
+  const handleStatusChange = async (taskId: string, newStatus: string) => {
+    const res = await fetch(`/api/tasks/${taskId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus }),
+    });
+    if (res.ok) {
+      await Promise.all([fetchTasks(), fetchLogs()]);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-gray-500 dark:text-gray-400">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          Ops Board
+        </h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {tasks.length} task{tasks.length !== 1 ? "s" : ""} tracked by
+          SchoolOpsAgent
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left: Task board */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Filters */}
+          <div className="flex gap-3">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              <option value="">All Statuses</option>
+              {TASK_STATUSES.filter(Boolean).map((s) => (
+                <option key={s} value={s}>
+                  {s.replace("_", " ")}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              <option value="">All Types</option>
+              {TASK_TYPES.filter(Boolean).map((t) => (
+                <option key={t} value={t}>
+                  {t.replace("_", " ")}
+                </option>
+              ))}
+            </select>
+
+            <button
+              onClick={() => {
+                setFilterStatus("");
+                setFilterType("");
+              }}
+              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+              Clear
+            </button>
+
+            <button
+              onClick={() => Promise.all([fetchTasks(), fetchLogs()])}
+              className="ml-auto rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              Refresh
+            </button>
+          </div>
+
+          <TaskTable tasks={tasks} onStatusChange={handleStatusChange} />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Right: Agent activity log */}
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            Agent Activity
+          </h2>
+          <LogFeed logs={logs} />
         </div>
-      </main>
+      </div>
     </div>
   );
 }

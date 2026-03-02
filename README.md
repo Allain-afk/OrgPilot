@@ -1,36 +1,140 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OrgPilot — School Ops Co-pilot
 
-## Getting Started
+An autonomous AI agent that watches school org inputs (forms, emails) and turns them into structured tasks, reminders, and status dashboards. Built for hackathon speed, production quality.
 
-First, run the development server:
+## Tech Stack
+
+- **Next.js 16** — App Router, TypeScript, React 19
+- **Vercel AI SDK v6** — Agent tool-calling, multi-step reasoning
+- **Prisma 7 + SQLite** — Portable schema (swap to Postgres anytime)
+- **Tailwind CSS v4** — Minimal, functional UI
+- **OpenAI gpt-4o-mini** — Cost-effective LLM (works without API key via mock agent)
+
+## Quick Start
 
 ```bash
+# 1. Install dependencies
+npm install
+
+# 2. Set up environment
+cp .env.example .env
+# Optional: add a real OPENAI_API_KEY for LLM-powered agent
+
+# 3. Run migrations + seed
+npx prisma migrate dev
+npx prisma db seed
+
+# 4. Start dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the dashboard.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Architecture
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+┌─────────────────┐     ┌─────────────────────┐     ┌──────────────┐
+│  Google Forms /  │────>│  /api/webhooks/forms │────>│  SchoolOps   │
+│  Email / Manual  │     │  /api/webhooks/email │     │  Agent       │
+└─────────────────┘     └─────────────────────┘     │  (AI SDK v6) │
+                                                      │              │
+                                                      │  Tools:      │
+                                                      │  - createTask│
+                                                      │  - updateTask│
+                                                      │  - notify    │
+                                                      │  - approve   │
+                                                      └──────┬───────┘
+                                                             │
+                              ┌───────────────────────────────┘
+                              v
+                        ┌──────────┐    ┌──────────────┐
+                        │  SQLite  │    │  Dashboard   │
+                        │  (Prisma)│<-->│  (React)     │
+                        └──────────┘    └──────────────┘
+```
 
-## Learn More
+## API Endpoints
 
-To learn more about Next.js, take a look at the following resources:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/webhooks/forms` | Receive form submissions, agent processes |
+| POST | `/api/webhooks/email` | Email webhook (stub) |
+| POST | `/api/agent/process` | Direct agent invocation |
+| GET | `/api/tasks` | List tasks (filterable by status/type/owner) |
+| POST | `/api/tasks` | Create task manually |
+| GET/PATCH | `/api/tasks/[id]` | Get or update a specific task |
+| GET | `/api/logs` | Agent action log entries |
+| POST | `/api/approvals/[id]` | Approve or dismiss a pending action |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Demo: Simulate a Form Submission
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# While dev server is running:
+bash scripts/demo-form-submission.sh
 
-## Deploy on Vercel
+# Or manually:
+curl -X POST http://localhost:3000/api/webhooks/forms \
+  -H "Content-Type: application/json" \
+  -d '{
+    "formType": "EVENT_REQUEST",
+    "payload": {
+      "title": "Annual Science Fair",
+      "description": "Book auditorium, arrange judges, set up registration",
+      "requestedBy": "Maria Lopez",
+      "preferredDate": "2026-04-15",
+      "estimatedAttendees": 200
+    }
+  }'
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Agent Behavior
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The SchoolOpsAgent uses a tool-calling loop to:
+
+1. **Parse** incoming events (form submissions, emails)
+2. **Create tasks** with appropriate type, priority, owner, and due date
+3. **Update tasks** when follow-up events arrive
+4. **Notify** officers for urgent items
+5. **Request approval** for high-impact actions (cancellations, budget commits)
+
+### Mock vs Real LLM
+
+- **No API key / placeholder**: Agent uses deterministic heuristics (mock mode). Fully functional for demos.
+- **Real OPENAI_API_KEY**: Agent uses gpt-4o-mini for intelligent reasoning and tool selection.
+
+## Data Model
+
+- **User** — Org officers (President, VP, Secretary, Treasurer, Logistics)
+- **Task** — Work items (EVENT_REQUEST, FACILITY, FINANCE, ISSUE, OTHER)
+- **AgentActionLog** — Full audit trail of agent decisions
+
+## Testing
+
+```bash
+npm test
+```
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm test` | Run tests (Vitest) |
+| `npm run seed` | Seed database |
+| `npm run db:migrate` | Run migrations |
+| `npm run db:studio` | Open Prisma Studio |
+
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | SQLite: `file:./prisma/dev.db` / Postgres: `postgresql://...` |
+| `OPENAI_API_KEY` | No | OpenAI key. Omit for mock agent mode. |
+
+## Switching to Postgres
+
+1. Change `provider = "sqlite"` to `provider = "postgresql"` in `prisma/schema.prisma`
+2. Update `DATABASE_URL` in `.env`
+3. Install `@prisma/adapter-pg` and swap the adapter in `lib/db/prisma.ts`
+4. Run `npx prisma migrate dev`

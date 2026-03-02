@@ -1,0 +1,63 @@
+// OrgPilot — School Ops Co-pilot
+// Prisma schema — SQLite-compatible, portable to Postgres
+// No enum keyword (SQLite limitation) — use String + TypeScript unions
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ──────────────────────────────────────────────
+// User — Org officers
+// ──────────────────────────────────────────────
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  role      String   @default("OTHER") // PRESIDENT | VICE_PRESIDENT | SECRETARY | TREASURER | LOGISTICS | OTHER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks Task[]
+}
+
+// ──────────────────────────────────────────────
+// Task — Core work item managed by the agent
+// ──────────────────────────────────────────────
+model Task {
+  id           String    @id @default(uuid())
+  title        String
+  description  String
+  type         String    @default("OTHER") // EVENT_REQUEST | ISSUE | FACILITY | FINANCE | OTHER
+  status       String    @default("NEW")   // NEW | IN_PROGRESS | BLOCKED | DONE | CANCELLED
+  priority     String    @default("MEDIUM") // LOW | MEDIUM | HIGH | URGENT
+  ownerId      String?
+  dueDate      DateTime?
+  sourceSystem String    @default("MANUAL") // FORM | EMAIL | MANUAL
+  sourceId     String    @default("")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  owner User?           @relation(fields: [ownerId], references: [id])
+  logs  AgentActionLog[]
+}
+
+// ──────────────────────────────────────────────
+// AgentActionLog — Audit trail of agent actions
+// ──────────────────────────────────────────────
+model AgentActionLog {
+  id                String   @id @default(uuid())
+  taskId            String?
+  eventType         String   // INGEST_EVENT | TASK_UPDATE | NOTIFICATION | APPROVAL_REQUEST
+  rawEvent          String   @default("{}") // JSON stored as text for portability
+  actionDescription String
+  autoExecuted      Boolean  @default(true)
+  proposedChanges   String?  // JSON — only for APPROVAL_REQUEST
+  createdAt         DateTime @default(now())
+
+  task Task? @relation(fields: [taskId], references: [id])
+}
