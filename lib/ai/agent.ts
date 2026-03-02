@@ -1,6 +1,6 @@
 import { generateText, stepCountIs } from "ai";
 import { openai } from "@ai-sdk/openai";
-import { SYSTEM_PROMPT } from "./prompt";
+import { ORGPILOT_SYSTEM_PROMPT } from "./prompt";
 import { agentTools } from "./tools";
 import { runMockAgent, type AgentResult } from "./mock-agent";
 
@@ -40,7 +40,7 @@ export async function runAgent(
   try {
     const result = await generateText({
       model: openai("gpt-4o-mini"),
-      system: SYSTEM_PROMPT,
+      system: ORGPILOT_SYSTEM_PROMPT,
       tools: agentTools,
       stopWhen: stepCountIs(5),
       prompt: userMessage,

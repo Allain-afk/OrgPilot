@@ -32,7 +32,7 @@ interface LogEntry {
   task?: { id: string; title: string } | null;
 }
 
-const TASK_TYPES = ["", "EVENT_REQUEST", "ISSUE", "FACILITY", "FINANCE", "OTHER"];
+const TASK_TYPES = ["", "EVENT_REQUEST", "FACILITY_ISSUE", "FINANCE_REQUEST", "MEMBERSHIP", "FEEDBACK_OR_COMPLAINT", "OTHER"];
 const TASK_STATUSES = [
   "",
   "NEW",
@@ -94,7 +94,7 @@ export default function Dashboard() {
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           {tasks.length} task{tasks.length !== 1 ? "s" : ""} tracked by
-          SchoolOpsAgent
+          OrgPilot
         </p>
       </div>
 

@@ -106,3 +106,45 @@ export async function findTasksBySourceId(sourceId: string) {
 export async function findUserByRole(role: string) {
   return prisma.user.findFirst({ where: { role } });
 }
+
+// ─── Assign owner ────────────────────────────────────────────────
+export async function assignTaskOwner(taskId: string, ownerId: string) {
+  return prisma.task.update({
+    where: { id: taskId },
+    data: { ownerId },
+    include: { owner: true },
+  });
+}
+
+// ─── Task review / health check ─────────────────────────────────
+export interface TaskReviewFilters {
+  status?: string;
+  type?: string;
+  priority?: string;
+  overdue?: boolean;
+}
+
+export async function getTasksForReview(filters?: TaskReviewFilters) {
+  const where: Record<string, unknown> = {};
+  if (filters?.status) where.status = filters.status;
+  if (filters?.type) where.type = filters.type;
+  if (filters?.priority) where.priority = filters.priority;
+
+  const tasks = await prisma.task.findMany({
+    where,
+    include: { owner: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const now = new Date();
+  return tasks
+    .map((t) => {
+      const dueDateMs = t.dueDate ? new Date(t.dueDate).getTime() : null;
+      const isOverdue = dueDateMs !== null && dueDateMs < now.getTime() && t.status !== "DONE" && t.status !== "CANCELLED";
+      const daysSinceUpdate = Math.floor(
+        (now.getTime() - new Date(t.updatedAt).getTime()) / (1000 * 60 * 60 * 24)
+      );
+      return { ...t, isOverdue, daysSinceUpdate };
+    })
+    .filter((t) => (filters?.overdue ? t.isOverdue : true));
+}

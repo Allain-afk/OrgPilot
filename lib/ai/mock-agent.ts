@@ -24,13 +24,23 @@ const FORM_TYPE_MAP: Record<string, { type: string; ownerRole: string; priority:
     priority: "HIGH",
   },
   FACILITY_ISSUE: {
-    type: "FACILITY",
+    type: "FACILITY_ISSUE",
     ownerRole: "LOGISTICS",
     priority: "HIGH",
   },
   FINANCE_REQUEST: {
-    type: "FINANCE",
+    type: "FINANCE_REQUEST",
     ownerRole: "TREASURER",
+    priority: "MEDIUM",
+  },
+  MEMBERSHIP: {
+    type: "MEMBERSHIP",
+    ownerRole: "SECRETARY",
+    priority: "MEDIUM",
+  },
+  FEEDBACK_OR_COMPLAINT: {
+    type: "FEEDBACK_OR_COMPLAINT",
+    ownerRole: "PRESIDENT",
     priority: "MEDIUM",
   },
 };
@@ -100,7 +110,7 @@ export async function runMockAgent(
   const task = await dbCreateTask({
     title,
     description,
-    type: mapping.type as "EVENT_REQUEST" | "ISSUE" | "FACILITY" | "FINANCE" | "OTHER",
+    type: mapping.type as "EVENT_REQUEST" | "FACILITY_ISSUE" | "FINANCE_REQUEST" | "MEMBERSHIP" | "FEEDBACK_OR_COMPLAINT" | "OTHER",
     priority: mapping.priority as "LOW" | "MEDIUM" | "HIGH" | "URGENT",
     ownerId,
     dueDate,

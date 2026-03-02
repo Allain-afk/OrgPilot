@@ -3,9 +3,10 @@
 
 export const TASK_TYPES = [
   "EVENT_REQUEST",
-  "ISSUE",
-  "FACILITY",
-  "FINANCE",
+  "FACILITY_ISSUE",
+  "FINANCE_REQUEST",
+  "MEMBERSHIP",
+  "FEEDBACK_OR_COMPLAINT",
   "OTHER",
 ] as const;
 export type TaskType = (typeof TASK_TYPES)[number];
@@ -40,6 +41,7 @@ export const EVENT_TYPES = [
   "TASK_UPDATE",
   "NOTIFICATION",
   "APPROVAL_REQUEST",
+  "AGENT_REASONING",
 ] as const;
 export type EventType = (typeof EVENT_TYPES)[number];
 

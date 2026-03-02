@@ -31,12 +31,12 @@ describe("Mock Agent Logic", () => {
         priority: "HIGH",
       },
       FACILITY_ISSUE: {
-        type: "FACILITY",
+        type: "FACILITY_ISSUE",
         ownerRole: "LOGISTICS",
         priority: "HIGH",
       },
       FINANCE_REQUEST: {
-        type: "FINANCE",
+        type: "FINANCE_REQUEST",
         ownerRole: "TREASURER",
         priority: "MEDIUM",
       },
@@ -52,7 +52,7 @@ describe("Mock Agent Logic", () => {
   it("maps FACILITY_ISSUE to LOGISTICS owner", () => {
     const FORM_TYPE_MAP: Record<string, { type: string; ownerRole: string; priority: string }> = {
       FACILITY_ISSUE: {
-        type: "FACILITY",
+        type: "FACILITY_ISSUE",
         ownerRole: "LOGISTICS",
         priority: "HIGH",
       },
@@ -60,7 +60,7 @@ describe("Mock Agent Logic", () => {
 
     const mapping = FORM_TYPE_MAP["FACILITY_ISSUE"];
     expect(mapping.ownerRole).toBe("LOGISTICS");
-    expect(mapping.type).toBe("FACILITY");
+    expect(mapping.type).toBe("FACILITY_ISSUE");
   });
 
   it("defaults unknown form types to OTHER/SECRETARY/MEDIUM", () => {

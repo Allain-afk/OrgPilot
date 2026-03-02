@@ -4,6 +4,8 @@ import {
   createTask as dbCreateTask,
   updateTaskStatus as dbUpdateTaskStatus,
   findUserByRole,
+  assignTaskOwner as dbAssignTaskOwner,
+  getTasksForReview,
 } from "@/lib/services/tasks";
 import { createLog } from "@/lib/services/logs";
 import { sendNotification as notifySend } from "@/lib/services/notifications";
@@ -18,7 +20,7 @@ export const createTaskTool = tool({
       .string()
       .describe("Detailed description with key facts from the event"),
     type: z
-      .enum(["EVENT_REQUEST", "ISSUE", "FACILITY", "FINANCE", "OTHER"])
+      .enum(["EVENT_REQUEST", "FACILITY_ISSUE", "FINANCE_REQUEST", "MEMBERSHIP", "FEEDBACK_OR_COMPLAINT", "OTHER"])
       .describe("Task category"),
     priority: z
       .enum(["LOW", "MEDIUM", "HIGH", "URGENT"])
@@ -181,10 +183,137 @@ export const requestApprovalTool = tool({
   },
 });
 
+// ─── assignOwner ────────────────────────────────────────────────
+export const assignOwnerTool = tool({
+  description:
+    "Reassign a task to a different officer by role. Use for escalations, checklist delegation, or when the original owner is unavailable.",
+  inputSchema: z.object({
+    taskId: z.string().describe("ID of the task to reassign"),
+    ownerRole: z
+      .enum([
+        "PRESIDENT",
+        "VICE_PRESIDENT",
+        "SECRETARY",
+        "TREASURER",
+        "LOGISTICS",
+        "OTHER",
+      ])
+      .describe("Role of the officer who should own this task"),
+    reason: z
+      .string()
+      .optional()
+      .describe("Why the task is being reassigned"),
+  }),
+  execute: async (input) => {
+    const user = await findUserByRole(input.ownerRole);
+    if (!user) {
+      return {
+        success: false,
+        message: `No user found with role ${input.ownerRole}`,
+      };
+    }
+
+    const task = await dbAssignTaskOwner(input.taskId, user.id);
+
+    await createLog({
+      taskId: task.id,
+      eventType: "TASK_UPDATE",
+      rawEvent: input,
+      actionDescription: `Reassigned task "${task.title}" to ${input.ownerRole} (${user.name})${input.reason ? ` — ${input.reason}` : ""}`,
+      autoExecuted: true,
+    });
+
+    return {
+      success: true,
+      taskId: task.id,
+      title: task.title,
+      newOwner: { id: user.id, name: user.name, role: user.role },
+    };
+  },
+});
+
+// ─── logAgentAction ─────────────────────────────────────────────
+export const logAgentActionTool = tool({
+  description:
+    "Log an agent reasoning step or decision for the audit trail. Use after creating/updating tasks to record why you chose a specific type, owner, or priority.",
+  inputSchema: z.object({
+    taskId: z
+      .string()
+      .optional()
+      .describe("Related task ID, if applicable"),
+    description: z
+      .string()
+      .describe(
+        "What you did and why (e.g., 'Classified as FACILITY_ISSUE with HIGH priority because the report mentions a safety hazard')"
+      ),
+  }),
+  execute: async (input) => {
+    const log = await createLog({
+      taskId: input.taskId,
+      eventType: "AGENT_REASONING",
+      rawEvent: input,
+      actionDescription: input.description,
+      autoExecuted: true,
+    });
+
+    return { success: true, logId: log.id };
+  },
+});
+
+// ─── listTasks ──────────────────────────────────────────────────
+export const listTasksTool = tool({
+  description:
+    "Query existing tasks with optional filters. Use for task health reviews, weekly recaps, or checking for duplicates before creating new tasks.",
+  inputSchema: z.object({
+    status: z
+      .enum(["NEW", "IN_PROGRESS", "BLOCKED", "DONE", "CANCELLED"])
+      .optional()
+      .describe("Filter by status"),
+    type: z
+      .enum(["EVENT_REQUEST", "FACILITY_ISSUE", "FINANCE_REQUEST", "MEMBERSHIP", "FEEDBACK_OR_COMPLAINT", "OTHER"])
+      .optional()
+      .describe("Filter by task type"),
+    priority: z
+      .enum(["LOW", "MEDIUM", "HIGH", "URGENT"])
+      .optional()
+      .describe("Filter by priority"),
+    overdue: z
+      .boolean()
+      .optional()
+      .describe("If true, only return tasks that are past their due date and not done/cancelled"),
+  }),
+  execute: async (input) => {
+    const tasks = await getTasksForReview({
+      status: input.status,
+      type: input.type,
+      priority: input.priority,
+      overdue: input.overdue,
+    });
+
+    return {
+      count: tasks.length,
+      tasks: tasks.map((t) => ({
+        id: t.id,
+        title: t.title,
+        type: t.type,
+        status: t.status,
+        priority: t.priority,
+        owner: t.owner ? { id: t.owner.id, name: t.owner.name, role: t.owner.role } : null,
+        dueDate: t.dueDate?.toISOString() ?? null,
+        isOverdue: t.isOverdue,
+        daysSinceUpdate: t.daysSinceUpdate,
+      })),
+    };
+  },
+});
+
 // ─── Export all tools as a record for the agent ─────────────────
 export const agentTools = {
   createTask: createTaskTool,
   updateTaskStatus: updateTaskStatusTool,
   sendNotification: sendNotificationTool,
   requestApproval: requestApprovalTool,
+  assignOwner: assignOwnerTool,
+  logAgentAction: logAgentActionTool,
+  listTasks: listTasksTool,
 };

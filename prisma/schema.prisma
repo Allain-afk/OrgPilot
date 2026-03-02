@@ -32,7 +32,7 @@ model Task {
   id           String    @id @default(uuid())
   title        String
   description  String
-  type         String    @default("OTHER") // EVENT_REQUEST | ISSUE | FACILITY | FINANCE | OTHER
+  type         String    @default("OTHER") // EVENT_REQUEST | FACILITY_ISSUE | FINANCE_REQUEST | MEMBERSHIP | FEEDBACK_OR_COMPLAINT | OTHER
   status       String    @default("NEW")   // NEW | IN_PROGRESS | BLOCKED | DONE | CANCELLED
   priority     String    @default("MEDIUM") // LOW | MEDIUM | HIGH | URGENT
   ownerId      String?

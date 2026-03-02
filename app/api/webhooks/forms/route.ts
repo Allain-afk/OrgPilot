@@ -6,6 +6,8 @@ const KNOWN_FORM_TYPES = [
   "EVENT_REQUEST",
   "FACILITY_ISSUE",
   "FINANCE_REQUEST",
+  "MEMBERSHIP",
+  "FEEDBACK_OR_COMPLAINT",
 ];
 
 export async function POST(req: Request) {

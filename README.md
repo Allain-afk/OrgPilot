@@ -89,7 +89,7 @@ curl -X POST http://localhost:3000/api/webhooks/forms \
 
 ## Agent Behavior
 
-The SchoolOpsAgent uses a tool-calling loop to:
+OrgPilot uses a tool-calling loop to:
 
 1. **Parse** incoming events (form submissions, emails)
 2. **Create tasks** with appropriate type, priority, owner, and due date

@@ -85,7 +85,7 @@ async function main() {
       title: "Fix broken projector in Room 204",
       description:
         "The ceiling-mounted projector in Room 204 is showing a yellow tint and intermittent power failures. Reported by Mr. Thompson.",
-      type: "FACILITY",
+      type: "FACILITY_ISSUE",
       status: "IN_PROGRESS",
       priority: "MEDIUM",
       ownerId: users[4].id, // Logistics
