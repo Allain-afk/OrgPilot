@@ -14,6 +14,7 @@ interface Task {
   title: string;
   description: string;
   type: string;
+  section: string | null;
   status: string;
   priority: string;
   owner: TaskOwner | null;
@@ -23,6 +24,16 @@ interface Task {
 }
 
 const STATUSES = ["NEW", "IN_PROGRESS", "BLOCKED", "DONE", "CANCELLED"];
+
+const sectionColors: Record<string, string> = {
+  NEWS: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+  FEATURES: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
+  OPINION: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
+  SPORTS: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+  LIFESTYLE: "bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300",
+  PHOTOGRAPHY: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900 dark:text-cyan-300",
+  LAYOUT: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300",
+};
 
 interface TaskTableProps {
   tasks: Task[];
@@ -50,6 +61,9 @@ export function TaskTable({ tasks, onStatusChange }: TaskTableProps) {
               Type
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              Section
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
               Status
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
@@ -60,9 +74,6 @@ export function TaskTable({ tasks, onStatusChange }: TaskTableProps) {
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
               Due Date
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              Source
             </th>
           </tr>
         </thead>
@@ -82,8 +93,19 @@ export function TaskTable({ tasks, onStatusChange }: TaskTableProps) {
               </td>
               <td className="px-4 py-3">
                 <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-                  {task.type.replace("_", " ")}
+                  {task.type.replace(/_/g, " ")}
                 </span>
+              </td>
+              <td className="px-4 py-3">
+                {task.section ? (
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${sectionColors[task.section] ?? sectionColors.NEWS}`}
+                  >
+                    {task.section}
+                  </span>
+                ) : (
+                  <span className="text-xs text-gray-400">—</span>
+                )}
               </td>
               <td className="px-4 py-3">
                 <select
@@ -109,7 +131,7 @@ export function TaskTable({ tasks, onStatusChange }: TaskTableProps) {
                   <div>
                     <div className="font-medium">{task.owner.name}</div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {task.owner.role.replace("_", " ")}
+                      {task.owner.role.replace(/_/g, " ")}
                     </div>
                   </div>
                 ) : (
@@ -120,11 +142,6 @@ export function TaskTable({ tasks, onStatusChange }: TaskTableProps) {
                 {task.dueDate
                   ? new Date(task.dueDate).toLocaleDateString()
                   : "—"}
-              </td>
-              <td className="px-4 py-3">
-                <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                  {task.sourceSystem}
-                </span>
               </td>
             </tr>
           ))}

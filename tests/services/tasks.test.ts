@@ -74,7 +74,7 @@ describe("Task CRUD", () => {
       id: "task-uuid-456",
       title: "Budget Review",
       description: "Review Q2 budget allocations",
-      type: "FINANCE",
+      type: "FINANCE_REQUEST",
       priority: "MEDIUM",
       status: "NEW",
       ownerId: mockUser.id,
@@ -95,7 +95,7 @@ describe("Task CRUD", () => {
       data: {
         title: "Budget Review",
         description: "Review Q2 budget allocations",
-        type: "FINANCE",
+        type: "FINANCE_REQUEST",
         priority: "MEDIUM",
         ownerId: user!.id,
         sourceSystem: "MANUAL",

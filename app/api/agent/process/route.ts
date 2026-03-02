@@ -21,6 +21,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       summary: result.summary,
+      agentId: result.agentId,
       steps: result.steps,
       toolCallCount: result.toolCallCount,
     });

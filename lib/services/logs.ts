@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/db/prisma";
-import type { EventType } from "@/lib/types";
+import type { EventType, AgentId } from "@/lib/types";
 import { updateTask } from "./tasks";
 
 // ─── Create ─────────────────────────────────────────────────────
 export interface CreateLogInput {
   taskId?: string;
+  agentId?: AgentId;
   eventType: EventType;
   rawEvent?: unknown;
   actionDescription: string;
@@ -16,6 +17,7 @@ export async function createLog(data: CreateLogInput) {
   return prisma.agentActionLog.create({
     data: {
       taskId: data.taskId ?? null,
+      agentId: data.agentId ?? "MASTER",
       eventType: data.eventType,
       rawEvent: data.rawEvent ? JSON.stringify(data.rawEvent) : "{}",
       actionDescription: data.actionDescription,

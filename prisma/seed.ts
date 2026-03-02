@@ -4,77 +4,126 @@ import { withAccelerate } from "@prisma/extension-accelerate";
 
 const accelerateUrl = process.env.DATABASE_URL;
 if (!accelerateUrl) {
-  console.error('DATABASE_URL must be set for Prisma Accelerate');
+  console.error("DATABASE_URL must be set for Prisma Accelerate");
   process.exit(1);
 }
 
 const prisma = new PrismaClient({ accelerateUrl }).$extends(withAccelerate());
 
 async function main() {
-  console.log("🌱 Seeding database...");
+  console.log("Seeding database for The Southern Scholar (USPF)...");
 
-  // ─── Users (org officers) ───────────────────────────────────
+  // ─── Staff members ─────────────────────────────────────────
   const users = await Promise.all([
     prisma.user.upsert({
-      where: { email: "maria.lopez@schoolorg.edu" },
+      where: { email: "eic@southernscholar.edu.ph" },
       update: {},
       create: {
-        name: "Maria Lopez",
-        email: "maria.lopez@schoolorg.edu",
-        role: "PRESIDENT",
+        name: "Carmen Reyes",
+        email: "eic@southernscholar.edu.ph",
+        role: "EDITOR_IN_CHIEF",
       },
     }),
     prisma.user.upsert({
-      where: { email: "james.chen@schoolorg.edu" },
+      where: { email: "assoc.editor@southernscholar.edu.ph" },
       update: {},
       create: {
-        name: "James Chen",
-        email: "james.chen@schoolorg.edu",
-        role: "VICE_PRESIDENT",
+        name: "Marco Santos",
+        email: "assoc.editor@southernscholar.edu.ph",
+        role: "ASSOCIATE_EDITOR",
       },
     }),
     prisma.user.upsert({
-      where: { email: "aisha.patel@schoolorg.edu" },
+      where: { email: "managing@southernscholar.edu.ph" },
       update: {},
       create: {
-        name: "Aisha Patel",
-        email: "aisha.patel@schoolorg.edu",
-        role: "SECRETARY",
+        name: "Alyssa Tan",
+        email: "managing@southernscholar.edu.ph",
+        role: "MANAGING_EDITOR",
       },
     }),
     prisma.user.upsert({
-      where: { email: "david.kim@schoolorg.edu" },
+      where: { email: "editorials@southernscholar.edu.ph" },
       update: {},
       create: {
-        name: "David Kim",
-        email: "david.kim@schoolorg.edu",
-        role: "TREASURER",
+        name: "Rafael Cruz",
+        email: "editorials@southernscholar.edu.ph",
+        role: "HEAD_EDITORIALS",
       },
     }),
     prisma.user.upsert({
-      where: { email: "sofia.martinez@schoolorg.edu" },
+      where: { email: "features@southernscholar.edu.ph" },
       update: {},
       create: {
-        name: "Sofia Martinez",
-        email: "sofia.martinez@schoolorg.edu",
-        role: "LOGISTICS",
+        name: "Isabelle Lim",
+        email: "features@southernscholar.edu.ph",
+        role: "HEAD_FEATURES_MARKETING",
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "writer1@southernscholar.edu.ph" },
+      update: {},
+      create: {
+        name: "Jessa Villanueva",
+        email: "writer1@southernscholar.edu.ph",
+        role: "WRITER",
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "photo1@southernscholar.edu.ph" },
+      update: {},
+      create: {
+        name: "Kyle Mendoza",
+        email: "photo1@southernscholar.edu.ph",
+        role: "PHOTOJOURNALIST",
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "layout@southernscholar.edu.ph" },
+      update: {},
+      create: {
+        name: "Trisha Garcia",
+        email: "layout@southernscholar.edu.ph",
+        role: "LAYOUT_ARTIST",
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "adviser@uspf.edu.ph" },
+      update: {},
+      create: {
+        name: "Prof. Elena Fernandez",
+        email: "adviser@uspf.edu.ph",
+        role: "ADVISER",
+      },
+    }),
+    prisma.user.upsert({
+      where: { email: "alegaspi_ccs@uspf.edu.ph" },
+      update: {},
+      create: {
+        id: "mock-observer-001",
+        name: "Allain Legaspi",
+        email: "alegaspi_ccs@uspf.edu.ph",
+        role: "ADMIN",
       },
     }),
   ]);
 
-  console.log(`  ✓ Created ${users.length} users`);
+  const [eic, _assoc, managing, headEdit, headFeatures, writer, photoj, layout] = users;
 
-  // ─── Tasks ──────────────────────────────────────────────────
+  console.log(`  Created ${users.length} staff members`);
+
+  // ─── Sample tasks ───────────────────────────────────────────
   const task1 = await prisma.task.create({
     data: {
-      title: "Annual Science Fair Planning",
+      title: "Write news article: USPF Foundation Day schedule",
       description:
-        "Need to book auditorium, arrange 5 judges, set up online registration form, and coordinate with the science department.",
-      type: "EVENT_REQUEST",
+        "Cover the upcoming USPF Foundation Day celebrations. Include schedule of events, keynote speaker info, and student org activities. Coordinate with admin office for official programme.",
+      type: "STORY_PITCH",
+      section: "NEWS",
       status: "NEW",
       priority: "HIGH",
-      ownerId: users[0].id, // President
-      dueDate: new Date("2026-04-15"),
+      ownerId: headEdit.id,
+      dueDate: new Date("2026-04-01"),
       sourceSystem: "FORM",
       sourceId: "form-resp-001",
     },
@@ -82,34 +131,52 @@ async function main() {
 
   const task2 = await prisma.task.create({
     data: {
-      title: "Fix broken projector in Room 204",
+      title: "Photo coverage: Intramurals Opening Ceremony",
       description:
-        "The ceiling-mounted projector in Room 204 is showing a yellow tint and intermittent power failures. Reported by Mr. Thompson.",
-      type: "FACILITY",
+        "Full photo coverage of the USPF Intramurals 2026 opening ceremony at the main gymnasium. Capture team presentations, torch lighting, and opening remarks.",
+      type: "PHOTO_ASSIGNMENT",
+      section: "SPORTS",
       status: "IN_PROGRESS",
-      priority: "MEDIUM",
-      ownerId: users[4].id, // Logistics
-      sourceSystem: "EMAIL",
-      sourceId: "email-msg-042",
+      priority: "HIGH",
+      ownerId: photoj.id,
+      sourceSystem: "MANUAL",
+      sourceId: "manual-002",
     },
   });
 
-  console.log(`  ✓ Created 2 sample tasks`);
+  const task3 = await prisma.task.create({
+    data: {
+      title: "Layout: Vol. 58 No. 1 — News section spread",
+      description:
+        "Design the news section spread (pages 2-5) for the first issue of Volume 58. Three articles confirmed, awaiting final photos from photojournalist.",
+      type: "LAYOUT_REQUEST",
+      section: "LAYOUT",
+      status: "NEW",
+      priority: "MEDIUM",
+      ownerId: layout.id,
+      dueDate: new Date("2026-04-10"),
+      sourceSystem: "MANUAL",
+      sourceId: "manual-003",
+    },
+  });
 
-  // ─── Agent action log ───────────────────────────────────────
+  console.log("  Created 3 sample tasks");
+
+  // ─── Agent action logs ──────────────────────────────────────
   await prisma.agentActionLog.create({
     data: {
       taskId: task1.id,
+      agentId: "EDITORIAL",
       eventType: "INGEST_EVENT",
       rawEvent: JSON.stringify({
-        formType: "EVENT_REQUEST",
+        formType: "STORY_PITCH",
         payload: {
-          title: "Annual Science Fair",
-          requestedBy: "Maria Lopez",
+          title: "USPF Foundation Day schedule",
+          section: "NEWS",
         },
       }),
       actionDescription:
-        'Created task "Annual Science Fair Planning" from Google Form submission. Assigned to President (Maria Lopez) with HIGH priority and due date 2026-04-15.',
+        'Editorial Agent created story pitch "Write news article: USPF Foundation Day schedule" in NEWS section. Assigned to Head for Editorials (Rafael Cruz) with HIGH priority.',
       autoExecuted: true,
     },
   });
@@ -117,19 +184,35 @@ async function main() {
   await prisma.agentActionLog.create({
     data: {
       taskId: task2.id,
+      agentId: "PRODUCTION",
       eventType: "TASK_UPDATE",
       rawEvent: JSON.stringify({
-        source: "email",
-        subject: "Projector Issue Room 204",
+        source: "manual",
+        subject: "Intramurals photo coverage",
       }),
       actionDescription:
-        'Updated facility task "Fix broken projector in Room 204" status to IN_PROGRESS. Assigned to Logistics (Sofia Martinez).',
+        'Production Agent assigned photo coverage "Intramurals Opening Ceremony" to Kyle Mendoza (PHOTOJOURNALIST). Status: IN_PROGRESS.',
       autoExecuted: true,
     },
   });
 
-  console.log(`  ✓ Created 2 agent action log entries`);
-  console.log("✅ Seed complete!");
+  await prisma.agentActionLog.create({
+    data: {
+      taskId: task1.id,
+      agentId: "MASTER",
+      eventType: "AGENT_REASONING",
+      rawEvent: JSON.stringify({
+        delegation: "EDITORIAL",
+        reason: "Story pitch about campus news event",
+      }),
+      actionDescription:
+        'Master Agent classified "USPF Foundation Day schedule" as editorial content and delegated to Editorial Agent.',
+      autoExecuted: true,
+    },
+  });
+
+  console.log("  Created 3 agent action log entries");
+  console.log("Seed complete for The Southern Scholar!");
 }
 
 main()

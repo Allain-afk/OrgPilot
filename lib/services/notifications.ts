@@ -159,6 +159,33 @@ export async function sendNotification(
     console.log(
       `[NOTIFICATION] No email transport configured (set BREVO_API_KEY) — logged instead.`
     );
+
+    if (input.channel === "EMAIL") {
+      // TODO: Plug in real email transport (Nodemailer, Resend, etc.)
+      // For now, the redirect target is logged; the transport would send to mock.email
+      console.log(
+        `[NOTIFICATION] Mock email to: ${mock.email} | Subject: ${mockSubject} | Body: ${input.body}`
+      );
+    } else {
+      console.log(
+        `[NOTIFICATION] LOG_ONLY (mock mode) | Original: ${originalEmail} | Subject: ${input.subject} | Body: ${input.body}`
+      );
+    }
+
+    return {
+      sent: true,
+      mockMode: true,
+      recipientEmail: mock.email,
+      recipientName: mock.name,
+      originalRecipient: `${originalName} (${originalEmail}, ${originalRole})`,
+      subject: mockSubject,
+    };
+  }
+
+  // Production mode — send to real recipient
+  if (input.channel === "EMAIL") {
+    // TODO: Plug in real email transport (Nodemailer, Resend, etc.)
+    console.log(`[NOTIFICATION] Email sending not configured — logged instead.`);
   }
 
   console.log(
